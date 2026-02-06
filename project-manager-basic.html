@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Manager Basics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* 1. THE SETUP */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #e2e8f0;
+        display: grid;
+        gap: 20px;
+        grid-template-columns: 1fr;
+        margin: 0;
+        min-height: 100vh;
+        padding: 20px 0;
+        place-items: center;
+        font-family: "Inter", sans-serif;
+      }
+
+      .slide-container {
+        align-items: center;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        height: 720px;
+        justify-content: center;
+        overflow: hidden;
+        padding: 60px;
+        position: relative;
+        width: 1280px;
+        border: 1px solid #f1f5f9;
+      }
+
+      /* Background Design - Subtle Abstract Curves */
+      .slide-container::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        right: -5%;
+        width: 40%;
+        height: 60%;
+        background: radial-gradient(
+          circle at center,
+          rgba(14, 165, 233, 0.08) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        border-radius: 50%;
+        z-index: 0;
+      }
+
+      .slide-container::after {
+        content: "";
+        position: absolute;
+        bottom: -15%;
+        left: -5%;
+        width: 35%;
+        height: 50%;
+        background: radial-gradient(
+          circle at center,
+          rgba(15, 23, 42, 0.05) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        border-radius: 50%;
+        z-index: 0;
+      }
+
+      .slide-container > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* 2. TYPOGRAPHY */
+      .slide-container h1,
+      .slide-container h2,
+      .slide-container h3 {
+        color: #0f172a; /* Slate 900 */
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      .slide-container h1 {
+        font-size: 64px;
+        line-height: 1.1;
+        margin-bottom: 20px;
+      }
+
+      .slide-container .slide-title {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 40px;
+        text-align: left;
+        width: 100%;
+        color: #0f172a;
+        border-left: 6px solid #0ea5e9; /* Sky 500 */
+        padding-left: 20px;
+      }
+
+      .slide-container p,
+      .slide-container li,
+      .slide-container .subtitle {
+        color: #334155; /* Slate 700 */
+        font-size: 20px;
+        line-height: 1.6;
+      }
+
+      .slide-container .subtitle {
+        font-size: 24px;
+        font-weight: 500;
+        color: #64748b; /* Slate 500 */
+        margin-top: 10px;
+      }
+
+      .highlight {
+        color: #0ea5e9;
+        font-weight: 700;
+      }
+
+      /* 3. LAYOUT DEFINITIONS */
+      .content-area {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: center;
+        width: 100%;
+      }
+
+      /* Title Slide */
+      .title-layout {
+        text-align: center;
+        max-width: 900px;
+      }
+      .title-layout hr {
+        border: none;
+        height: 4px;
+        background: linear-gradient(90deg, #0f172a, #0ea5e9);
+        width: 100px;
+        margin: 30px auto;
+        border-radius: 2px;
+      }
+
+      /* Two Column */
+      .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        width: 100%;
+        align-items: center;
+      }
+
+      .two-column.tiled {
+        align-items: stretch;
+      }
+
+      .two-column.tiled > div {
+        background-color: #f8fafc;
+        border-radius: 16px;
+        padding: 40px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .two-column.tiled h3 {
+        color: #0ea5e9;
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      /* Image Styling */
+      .image-wrapper {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        height: 400px;
+        width: 100%;
+      }
+
+      .image-wrapper img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover; /* Ensuring consistency */
+      }
+
+      /* Tiled Text with Icons */
+      .tiled-content {
+        display: flex;
+        gap: 30px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .tile {
+        flex: 1;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        transition: transform 0.2s;
+      }
+
+      .tile .icon {
+        font-size: 48px;
+        color: #0ea5e9;
+        margin-bottom: 20px;
+        background: #e0f2fe;
+        width: 90px;
+        height: 90px;
+        line-height: 90px;
+        border-radius: 50%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .tile h3 {
+        font-size: 22px;
+        margin-bottom: 15px;
+      }
+
+      .tile p {
+        font-size: 16px;
+      }
+
+      /* Timeline */
+      .timeline-layout {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        padding: 0 40px;
+      }
+
+      .timeline-line {
+        position: absolute;
+        top: 50%;
+        left: 60px;
+        right: 60px;
+        height: 4px;
+        background: #e2e8f0;
+        z-index: 0;
+        transform: translateY(-50%);
+      }
+
+      .timeline-item {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        width: 200px;
+        background: white; /* To hide line behind text if needed */
+        padding: 10px;
+      }
+
+      .timeline-marker {
+        width: 50px;
+        height: 50px;
+        background-color: #0f172a;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 20px;
+        margin: 0 auto 20px auto;
+        border: 4px solid #0ea5e9;
+      }
+
+      /* Styled Bullets */
+      .bullet-list ul {
+        list-style: none;
+        padding: 0;
+      }
+      .bullet-list li {
+        background: #f8fafc;
+        margin-bottom: 15px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        border-left: 4px solid #0ea5e9;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .bullet-list li i {
+        color: #0f172a;
+        width: 30px;
+        text-align: center;
+      }
+
+      /* Bleed Image */
+      .slide-container.bleed-image-layout {
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+      }
+      .slide-container.bleed-image-layout .content-container {
+        padding: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+      }
+      .slide-container.bleed-image-layout img.bleed-image-side {
+        height: 720px;
+        width: 100%;
+        object-fit: cover;
+      }
+
+      /* Highlighted Numbers */
+      .highlight-numbers-layout {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        text-align: center;
+      }
+      .highlight-number-item {
+        flex: 1;
+        padding: 20px;
+      }
+      .highlight-number {
+        font-size: 80px;
+        font-weight: 800;
+        color: #0ea5e9;
+        line-height: 1;
+        margin-bottom: 10px;
+      }
+      .highlight-label {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 10px;
+      }
+
+      /* Rounded Image */
+      .rounded-image-layout {
+        align-items: center;
+      }
+      .rounded-image-layout .image-wrapper {
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Slide 1: Title Slide -->
+    <div class="slide-container" id="slide1">
+      <div class="title-layout">
+        <h1>Project Manager<br /><span class="highlight">Basics</span></h1>
+        <hr />
+        <p class="subtitle">Sharing Session: Introduction to Project Success</p>
+        <p style="margin-top: 30px; font-style: italic; color: #64748b">
+          "Transforming abstract ideas into reality through careful planning and
+          precise execution."
+        </p>
+      </div>
+    </div>
+
+    <!-- Slide 2: What is a Project Manager? -->
+    <div class="slide-container" id="slide2">
+      <h2 class="slide-title">What is a Project Manager?</h2>
+      <div class="content-area">
+        <div class="two-column">
+          <div>
+            <ul class="bullet-list">
+              <li>
+                <i class="fa-solid fa-user-tie"></i>
+                <strong>Definition:</strong> The individual fully responsible
+                for planning, leading, executing, and closing projects.
+              </li>
+              <li>
+                <i class="fa-solid fa-list-check"></i>
+                <strong>Responsibilities:</strong> Managing teams, budgets,
+                timelines, and risks to achieve goals.
+              </li>
+              <li>
+                <i class="fa-solid fa-bridge"></i>
+                <strong>Critical Role:</strong> Acting as the "bridge" between
+                strategic business vision and technical results.
+              </li>
+            </ul>
+            <p style="margin-top: 20px; font-weight: 500">
+              Without an effective PM, projects are vulnerable to
+              <em>scope creep</em> and cost overruns.
+            </p>
+          </div>
+          <div class="image-wrapper">
+            <img
+              src="assets/slide-2.png"
+              style="object-fit: cover"
+              alt="Professional Project Manager leading a meeting"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: Project Life Cycle -->
+    <div class="slide-container" id="slide3">
+      <h2 class="slide-title">Project Life Cycle</h2>
+      <div class="content-area">
+        <div class="timeline-layout">
+          <div class="timeline-line"></div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker">1</div>
+            <h3>Initiation</h3>
+            <p style="font-size: 16px">Goal Definition & Approval (Charter)</p>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker">2</div>
+            <h3>Planning</h3>
+            <p style="font-size: 16px">Creating Roadmap, Budget & Schedule</p>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker">3</div>
+            <h3>Execution</h3>
+            <p style="font-size: 16px">Teamwork & Progress Monitoring</p>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker">4</div>
+            <h3>Closing</h3>
+            <p style="font-size: 16px">Handover & Final Evaluation</p>
+          </div>
+        </div>
+        <p style="text-align: center; margin-top: 40px; font-style: italic">
+          Each phase has deliverables that must be approved before proceeding to
+          the next.
+        </p>
+      </div>
+    </div>
+
+    <!-- Slide 4: SDLC Basic Concept -->
+    <div class="slide-container" id="slide4">
+      <h2 class="slide-title">SDLC Basic Concepts</h2>
+      <div class="content-area">
+        <div class="two-column tiled">
+          <div>
+            <h3>Definition & Relationship</h3>
+            <p>
+              <strong>Software Development Life Cycle (SDLC)</strong> is a
+              systematic framework for creating high-quality software.
+            </p>
+            <br />
+            <p>
+              In the context of IT Project Management, SDLC is the technical
+              methodology executed during the <em>Execution</em> phase.
+            </p>
+          </div>
+          <div>
+            <h3>Common SDLC Phases</h3>
+            <ul style="list-style: none; padding: 0">
+              <li style="margin-bottom: 10px">
+                <i class="fa-solid fa-arrow-right" style="color: #0ea5e9"></i>
+                Requirement Analysis
+              </li>
+              <li style="margin-bottom: 10px">
+                <i class="fa-solid fa-arrow-right" style="color: #0ea5e9"></i>
+                System Design
+              </li>
+              <li style="margin-bottom: 10px">
+                <i class="fa-solid fa-arrow-right" style="color: #0ea5e9"></i>
+                Development (Coding)
+              </li>
+              <li style="margin-bottom: 10px">
+                <i class="fa-solid fa-arrow-right" style="color: #0ea5e9"></i>
+                Testing (QA)
+              </li>
+              <li style="margin-bottom: 10px">
+                <i class="fa-solid fa-arrow-right" style="color: #0ea5e9"></i>
+                Deployment
+              </li>
+              <li>
+                <i class="fa-solid fa-arrow-right" style="color: #0ea5e9"></i>
+                Maintenance
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Project Phases & Roles -->
+    <div class="slide-container" id="slide5">
+      <h2 class="slide-title">Key Project Roles</h2>
+      <div class="content-area">
+        <div class="tiled-content">
+          <div class="tile">
+            <div class="icon"><i class="fa-solid fa-crown"></i></div>
+            <h3>Project Manager</h3>
+            <p>
+              Strategic leader. Focuses on "Managing Process". Responsible for
+              overall project success.
+            </p>
+          </div>
+          <div class="tile">
+            <div class="icon"><i class="fa-solid fa-users-gear"></i></div>
+            <h3>Project Team</h3>
+            <p>
+              Technical experts (Developers, Designers, Analysts). Focuses on
+              "Managing Work". Responsible for producing the product.
+            </p>
+          </div>
+          <div class="tile">
+            <div class="icon"><i class="fa-solid fa-handshake"></i></div>
+            <h3>Stakeholders</h3>
+            <p>
+              Clients, Sponsors, or Users. Focuses on "Requirement & Value".
+              Provides input and approval.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: Project Planning Skills -->
+    <div class="slide-container" id="slide6">
+      <h2 class="slide-title">Project Planning Skills</h2>
+      <div class="content-area">
+        <div class="two-column">
+          <div>
+            <p style="margin-bottom: 20px">
+              Failing to plan is planning to fail. 5 vital planning elements:
+            </p>
+            <ul class="bullet-list">
+              <li>
+                <i class="fa-solid fa-bullseye"></i>
+                <strong>Scope:</strong> Defining what is In-scope and Out-scope.
+              </li>
+              <li>
+                <i class="fa-solid fa-calendar-days"></i>
+                <strong>Timeline:</strong> Creating realistic schedules and
+                milestones.
+              </li>
+              <li>
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <strong>Budget:</strong> Estimating resource and tool costs.
+              </li>
+              <li>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <strong>Risk:</strong> Identifying potential issues and
+                mitigation plans.
+              </li>
+              <li>
+                <i class="fa-solid fa-people-group"></i>
+                <strong>Resource:</strong> Allocating the right human resources
+                for each task.
+              </li>
+            </ul>
+          </div>
+          <div style="text-align: center">
+            <i
+              class="fa-solid fa-map-location-dot"
+              style="font-size: 200px; color: #cbd5e1"
+            ></i>
+            <p style="margin-top: 20px; color: #64748b">
+              "A goal without a plan is just a wish."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: Timeline, Budget, and Scope -->
+    <div class="slide-container" id="slide7">
+      <h2 class="slide-title">The Project Management Triangle</h2>
+      <div class="content-area">
+        <div class="two-column">
+          <div>
+            <h3>The Triple Constraint</h3>
+            <p>
+              Project quality is constrained by three interdependent elements:
+            </p>
+            <br />
+            <ul class="bullet-list">
+              <li>
+                <i class="fa-solid fa-clock"></i> <strong>Time:</strong> How
+                fast?
+              </li>
+              <li>
+                <i class="fa-solid fa-coins"></i> <strong>Cost:</strong> How
+                cheap?
+              </li>
+              <li>
+                <i class="fa-solid fa-maximize"></i> <strong>Scope:</strong> How
+                many features?
+              </li>
+            </ul>
+            <p class="highlight" style="margin-top: 20px">
+              Golden Rule: You cannot change one side without affecting the
+              others.
+            </p>
+          </div>
+          <div class="image-wrapper">
+            <img
+              src="assets/slide-7.png"
+              style="object-fit: cover"
+              alt="Project Management Triangle Illustration"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: Project Execution -->
+    <div class="slide-container" id="slide8">
+      <h2 class="slide-title">Project Execution</h2>
+      <div class="content-area">
+        <div class="two-column tiled">
+          <div>
+            <h3>Team Coordination</h3>
+            <p>
+              Execution is the phase where plans become reality. The key is
+              communication routines:
+            </p>
+            <ul style="margin-top: 15px; padding-left: 20px">
+              <li><strong>Daily Standup:</strong> Quick 15-minute update.</li>
+              <li><strong>Weekly Sync:</strong> Weekly progress review.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Managing Issues & Deliverables</h3>
+            <p>
+              Problems will arise. A PM's job isn't to avoid them, but to manage
+              them (Issue Management).
+            </p>
+            <p style="margin-top: 15px">
+              The team's focus must remain on <strong>Deliverables</strong> that
+              meet quality specifications.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: Leadership & Team Management -->
+    <div class="slide-container" id="slide9">
+      <h2 class="slide-title">Leadership & Team Management</h2>
+      <div class="content-area">
+        <div class="two-column rounded-image-layout">
+          <div class="image-wrapper">
+            <img
+              src="assets/slide-9.png"
+              alt="Diverse Team Collaborating"
+            />
+          </div>
+          <div>
+            <h3>More Than Just a Boss</h3>
+            <p>A Project Manager is a servant leader. Key duties:</p>
+            <ul class="bullet-list" style="margin-top: 20px; padding-left: 5px;">
+              <li>
+                <i class="fa-solid fa-heart"></i>
+                <strong>Building Trust</strong> Creating psychological safety.
+              </li>
+              <li>
+                <i class="fa-solid fa-scale-balanced"></i>
+                <strong>Conflict Management</strong> Mediating differences into
+                constructive solutions.
+              </li>
+              <li>
+                <i class="fa-solid fa-fire"></i>
+                <strong>Motivation</strong> Giving appreciation and reminding
+                the team of the big picture.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: Monitoring & Control -->
+    <div class="slide-container" id="slide10">
+      <h2 class="slide-title">Monitoring & Control</h2>
+      <div class="content-area">
+        <p
+          style="text-align: center; max-width: 800px; margin: 0 auto 40px auto"
+        >
+          To keep the project On Track, a Project Manager must be able to answer
+          3 key questions at any time:
+        </p>
+
+        <div class="highlight-numbers-layout">
+          <div class="highlight-number-item">
+            <div class="highlight-number">1</div>
+            <div class="highlight-label">Status</div>
+            <p>Where are we now?</p>
+          </div>
+          <div class="highlight-number-item">
+            <div class="highlight-number">2</div>
+            <div class="highlight-label">Achievement</div>
+            <p>What is already done?</p>
+          </div>
+          <div class="highlight-number-item">
+            <div class="highlight-number">3</div>
+            <div class="highlight-label">Remaining</div>
+            <p>What still needs to be done?</p>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px">
+          <p>
+            <strong>Tools:</strong> Progress Report, Burndown Chart, Gantt Chart
+            Tracking.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: Communication Skills -->
+    <div class="slide-container" id="slide11">
+      <h2 class="slide-title">Communication Skills</h2>
+      <div class="content-area">
+        <p style="text-align: center; margin-bottom: 40px">
+          "90% of a Project Manager's job is communication."
+        </p>
+        <div class="tiled-content">
+          <div class="tile">
+            <div class="icon"><i class="fa-solid fa-laptop-code"></i></div>
+            <h3>To the Team</h3>
+            <p>
+              Use clear language, precise technical details, and unambiguous
+              instructions.
+            </p>
+          </div>
+          <div class="tile">
+            <div class="icon"><i class="fa-solid fa-briefcase"></i></div>
+            <h3>To Stakeholders</h3>
+            <p>
+              Avoid technical jargon. Focus on business impact, budget,
+              timeline, and risks.
+            </p>
+          </div>
+          <div class="tile">
+            <div class="icon"><i class="fa-solid fa-file-pen"></i></div>
+            <h3>Reporting</h3>
+            <p>
+              Reports must be honest, concise, and dense. Deliver bad news as
+              soon as possible.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 12: Project Closing & Go Live -->
+    <div class="slide-container bleed-image-layout" id="slide12">
+      <div class="content-container">
+        <h2 class="slide-title">Closing & Go Live</h2>
+        <div class="content-area">
+          <div class="bleed-text-side">
+            <h3>The Finish Line</h3>
+            <p>Crucial final phase to ensure project value is delivered:</p>
+            <ul class="bullet-list">
+              <li>
+                <i class="fa-solid fa-rocket"></i>
+                <strong>Go Live:</strong> Official launch to users.
+              </li>
+              <li>
+                <i class="fa-solid fa-box-archive"></i>
+                <strong>Handover:</strong> Transfer of documents, access, and
+                operations.
+              </li>
+              <li>
+                <i class="fa-solid fa-book-open"></i>
+                <strong>Lessons Learned:</strong> Documenting successes and
+                failures for future learning.
+              </li>
+              <li>
+                <i class="fa-solid fa-champagne-glasses"></i>
+                <strong>Celebration:</strong> Celebrate the team's hard work!
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="image-container">
+        <img
+          class="bleed-image-side"
+          src="assets/slide-12.png"
+          alt="Business team celebrating success"
+        />
+      </div>
+    </div>
+  </body>
+</html>
